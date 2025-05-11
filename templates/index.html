@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>MusicGen: Text-to-Music</title>
+	<style>
+		body {
+			background-color: #121212;
+			color: #f0f0f0;
+			font-family: 'Segoe UI', sans-serif;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 2rem;
+		}
+
+		h1 {
+			color: #90caf9;
+			font-size: 2.5rem;
+			margin-bottom: 0.5rem;
+		}
+
+		p.subtitle {
+			color: #b0b0b0;
+			margin-top: 0;
+			margin-bottom: 2rem;
+		}
+
+		.form-container {
+			background-color: #1e1e1e;
+			padding: 2rem;
+			border-radius: 12px;
+			box-shadow: 0 0 10px rgba(0,0,0,0.5);
+			width: 100%;
+			max-width: 600px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+
+		input[type="text"] {
+			width: 100%;
+			padding: 0.75rem;
+			border: none;
+			border-radius: 8px;
+			margin-bottom: 1.2rem;
+			font-size: 1rem;
+		}
+
+		.example {
+			font-size: 0.85rem;
+			color: #888;
+			margin-bottom: 1rem;
+		}
+
+		button, input[type="submit"] {
+			background-color: #1976d2;
+			color: white;
+			border: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: 8px;
+			font-size: 1rem;
+			cursor: pointer;
+			margin-top: 0.5rem;
+		}
+
+		button:hover, input[type="submit"]:hover {
+			background-color: #1565c0;
+		}
+
+		#audio-section {
+			margin-top: 2rem;
+			text-align: center;
+		}
+
+		#loader {
+			display: none;
+			margin-top: 1rem;
+			color: #90caf9;
+		}
+
+		#prompts-container input {
+			margin-top: 0.5rem;
+		}
+
+		audio {
+			margin-top: 1rem;
+		}
+	</style>
+
+	<script>
+		function addPromptField() {
+			const container = document.getElementById("prompts-container");
+			const newInput = document.createElement("input");
+			newInput.type = "text";
+			newInput.name = "prompt";
+			newInput.placeholder = "e.g. synth guitar";
+			container.appendChild(newInput);
+		}
+
+		function removePromptField() {
+			const container = document.getElementById("prompts-container");
+			const inputs = container.getElementsByTagName("input");
+			if (inputs.length > 1) {
+				container.removeChild(inputs[inputs.length - 1]);
+			} else {
+				alert("At least one prompt is required.");
+			}
+		}
+
+		function showLoader() {
+			document.getElementById("loader").style.display = "block";
+			document.querySelector("form").style.opacity = 0.5;
+		}
+	</script>
+</head>
+<body>
+	<h1>🎵 MusicGen</h1>
+	<p class="subtitle">Generate music from text prompts using AI</p>
+
+	<div class="form-container">
+		<form method="POST" onsubmit="showLoader()">
+			<div id="prompts-container">
+				<label for="prompt">Describe the music:</label>
+				<input type="text" name="prompt" placeholder="e.g. sad retro game music" value="{{ prompts[0] if prompts else '' }}">
+			</div>
+			<center><div class="example">You can add more prompts for polyphonic blending.</div></center>
+			<div style="display: flex; justify-content: space-between;">
+				<button type="button" onclick="addPromptField()">➕ Add Prompt</button>
+				<button type="button" onclick="removePromptField()">➖ Remove Prompt</button>
+			</div>
+			<center><input type="submit" value="Generate Music 🎶"></center>
+		</form>
+		<div id="loader" style="text-align: center;">⏳ Generating music... please wait.</div>
+	</div>
+
+	{% if audio_file %}
+	<div id="audio-section">
+		<h2>🔊 Your AI-Generated Music</h2>
+		<audio controls>
+			<source src="{{ url_for('static_file', filename=audio_file) }}" type="audio/wav">
+			Your browser does not support the audio element.
+		</audio>
+	</div>
+	{% endif %}
+</body>
+</html>
